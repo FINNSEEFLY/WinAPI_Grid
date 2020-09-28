@@ -21,15 +21,19 @@ void PaintCells(HDC &hDC);
 
 int const NUM_OF_COLUMNS = 5;
 int const NUM_OF_ROWS = 5;
+double const SCALE = 0.05;
+char const *placeholder = "i'm a placeholder!";
 
 struct Cell {
     int left;
     int top;
     int right;
     int bottom;
+    RECT text;
 };
 
-static Cell Cells[NUM_OF_ROWS][NUM_OF_COLUMNS];
+Cell Cells[NUM_OF_ROWS][NUM_OF_COLUMNS];
+
 
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -54,7 +58,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
     RegisterClassEx(&wcex);
 
-
     hWnd = CreateWindow("SomeWindowClass", "Some Window",
                         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0,
                         CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
@@ -65,7 +68,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
-        UpdateWindow(hWnd);
     }
 
     return (int) msg.wParam;
@@ -102,6 +104,7 @@ void PaintGrid(HWND hWnd) {
     HPEN hPen = CreatePen(PS_SOLID, 6, RGB(0, 0, 0));
     HPEN oldPen = SelectPen(memDC, hPen);
 
+    // Фон
     LOGBRUSH br;
     br.lbStyle = BS_SOLID;
     br.lbColor = RGB(255, 255, 255);
@@ -110,11 +113,14 @@ void PaintGrid(HWND hWnd) {
     FillRect(memDC, &clientRect, brush);
     DeleteObject(brush);
 
+    // Таблица
     Rectangle(memDC, 0, 0, clientWidth, clientHeight);
-    CellCalculation(clientWidth,clientHeight);
+    CellCalculation(clientWidth, clientHeight);
     PaintCells(memDC);
     SetStretchBltMode(winDC, COLORONCOLOR);
+
     BitBlt(winDC, 0, 0, clientWidth, clientHeight, memDC, 0, 0, SRCCOPY);
+
 
     DeleteObject(hBmp);
     DeletePen(SelectPen(memDC, oldPen));
@@ -131,6 +137,10 @@ void CellCalculation(int width, int height) {
             Cells[i][j].right = (j + 1) * cellWidth;
             Cells[i][j].top = i * cellHeight;
             Cells[i][j].bottom = (i + 1) * cellHeight;
+            Cells[i][j].text.left = Cells[i][j].left + cellWidth * SCALE;
+            Cells[i][j].text.top = Cells[i][j].top + cellHeight * SCALE;
+            Cells[i][j].text.right = Cells[i][j].right - cellWidth * SCALE;
+            Cells[i][j].text.bottom = Cells[i][j].bottom - cellHeight * SCALE;
         }
     }
 }
@@ -138,7 +148,8 @@ void CellCalculation(int width, int height) {
 void PaintCells(HDC &hDC) {
     for (int i = 0; i < NUM_OF_ROWS; i++) {
         for (int j = 0; j < NUM_OF_COLUMNS; j++) {
-            Rectangle(hDC,Cells[i][j].left,Cells[i][j].top,Cells[i][j].right,Cells[i][j].bottom);
+            Rectangle(hDC, Cells[i][j].left, Cells[i][j].top, Cells[i][j].right, Cells[i][j].bottom);
+            DrawTextA(hDC, placeholder, 18, (LPRECT) &Cells[i][j].text, DT_CENTER | DT_WORDBREAK | DT_VCENTER);
         }
     }
 }
