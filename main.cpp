@@ -94,6 +94,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
             break;
         case WM_DESTROY:
             PostQuitMessage(0);
+        case WM_ERASEBKGND:
+            break;
         default:
             return DefWindowProc(hWnd, message, wParam, lParam);
     }
