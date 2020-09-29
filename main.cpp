@@ -22,7 +22,8 @@ void PaintCells(HDC &hDC);
 int const NUM_OF_COLUMNS = 5;
 int const NUM_OF_ROWS = 5;
 double const SCALE = 0.05;
-char const *placeholder = "i'm a placeholder!";
+char const *placeholder = "I'm a placeholder!";
+static LOGFONT lf;
 
 struct Cell {
     int left;
@@ -55,6 +56,15 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     wcex.lpszMenuName = NULL;
     wcex.lpszClassName = "SomeWindowClass";
     wcex.hIconSm = wcex.hIcon;
+
+
+    lf.lfCharSet = DEFAULT_CHARSET;
+    lf.lfPitchAndFamily = DEFAULT_PITCH;
+    strcpy(lf.lfFaceName, "Open Sans");
+    lf.lfHeight = 42;
+    lf.lfWidth = 15;
+    lf.lfWeight = 32;
+    lf.lfEscapement = 0;
 
     RegisterClassEx(&wcex);
 
@@ -113,6 +123,12 @@ void PaintGrid(HWND hWnd) {
     FillRect(memDC, &clientRect, brush);
     DeleteObject(brush);
 
+    // Настройка шрифта
+    HFONT hFont = CreateFontIndirect(&lf);
+    SelectObject(memDC, hFont);
+    SetTextColor(memDC, RGB(0, 0, 0));
+    SetBkColor(memDC, RGB(255, 255, 255));
+
     // Таблица
     Rectangle(memDC, 0, 0, clientWidth, clientHeight);
     CellCalculation(clientWidth, clientHeight);
@@ -122,6 +138,7 @@ void PaintGrid(HWND hWnd) {
     BitBlt(winDC, 0, 0, clientWidth, clientHeight, memDC, 0, 0, SRCCOPY);
 
 
+    DeleteObject(hFont);
     DeleteObject(hBmp);
     DeletePen(SelectPen(memDC, oldPen));
     DeleteDC(memDC);
