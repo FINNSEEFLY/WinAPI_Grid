@@ -168,7 +168,7 @@ void PaintCells(HDC &hDC) {
     for (int i = 0; i < NUM_OF_ROWS; i++) {
         for (int j = 0; j < NUM_OF_COLUMNS; j++) {
             Rectangle(hDC, Cells[i][j].left, Cells[i][j].top, Cells[i][j].right, Cells[i][j].bottom);
-            DrawTextA(hDC, placeholder, 18, (LPRECT) &Cells[i][j].text, DT_CENTER | DT_WORDBREAK | DT_VCENTER | DT_EDITCONTROL);
+            DrawTextA(hDC, placeholder, 18, (LPRECT) &Cells[i][j].text, DT_CENTER | DT_WORDBREAK | DT_EDITCONTROL);
         }
     }
 }
